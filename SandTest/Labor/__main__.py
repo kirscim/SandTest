@@ -3,6 +3,8 @@ from tkinter import ttk
 from datetime import date
 import os
 from tkinter import messagebox as mBox
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 
 class OOP():
@@ -118,29 +120,41 @@ class OOP():
         # Button callback
         self.checkVar0_32 = tk.IntVar()
         self.checkVar0_4 = tk.IntVar()
-        self.checkVar4_32 = tk.IntVar()
+        self.checkVar4_16 = tk.IntVar()
+        self.checkVar16_32 = tk.IntVar()
         self.check0_32 = ttk.Checkbutton(self.win, text="0/32 Siebline",
-                                         variable=self.checkVar0_32)
+                                         variable=self.checkVar0_32,
+                                         onvalue=1, offvalue=0)
         self.check0_4 = ttk.Checkbutton(self.win, text="0/4 Siebline",
-                                        variable=self.checkVar0_4)
-        self.check4_32 = ttk.Checkbutton(self.win, text="4/32 Sieblinie",
-                                         variable=self.checkVar4_32)
+                                        variable=self.checkVar0_4,
+                                        onvalue=1, offvalue=0)
+        self.check4_16 = ttk.Checkbutton(self.win, text="4/16 Sieblinie",
+                                         variable=self.checkVar4_16,
+                                         onvalue=1, offvalue=0)
+        self.check16_32 = ttk.Checkbutton(self.win, text="16/32 Sieblinie",
+                                          variable=self.checkVar16_32,
+                                          onvalue=1, offvalue=0)
         self.check0_32.grid(column=1, row=7, sticky=tk.W)
         self.check0_4.grid(column=2, row=7, sticky=tk.W)
-        self.check4_32.grid(column=3, row=7, sticky=tk.W)
+        self.check4_16.grid(column=3, row=7, sticky=tk.W)
+        self.check16_32.grid(column=4, row=7, sticky=tk.W)
         self.create_pdf = ttk.Button(self.win, text="Sieblinie erstellen",
                                      command=self.create_file)
-        self.create_pdf.grid(column=4, row=7)
+        self.create_pdf.grid(column=5, row=7)
+
+    def test_file(self):
+        x = 1
         self.name = str(date.today())+"_"+self.b1.get()+"_"+self.b2.get()+"_" +\
             str(self.vdouble.get())+"_"+self.motor.get()+"_"+self.aufstr.get()+"_" +\
             self.probe_t.get()+"_"+str(self.probe_nr.get())
-
-    def test_file(self):
         if os.path.isfile("storage/"+str(self.name)+".txt"):
             mBox.showinfo("", "Die Datei existiert bereits!")
+            x = 0
+            file = None
+            return file, x
         else:
             file = open("storage/"+str(self.name)+".txt", "w")
-            return file
+            return file, x
 
     def test_v(self):
         x = 1
@@ -150,32 +164,194 @@ class OOP():
             x = 0
             return x
 
+    def create_pdf_file(self):
+        pass
+
+    def create_plot(self):
+        self.xaxis_ertrag = [0.063, 0.125, 0.25, 0.5, 1, 2, 4, 5.6, 8, 11, 16, 22, 32, 45]
+        self.xaxis_sand = [0.063, 0.125, 0.25, 0.5, 1, 2, 4]
+        if self.checkVar0_4.get() == 1:
+            x = self.xaxis_sand
+            if self.checkVar0_32.get()+self.checkVar4_16.get()+self.checkVar16_32.get() >= 1:
+                x = self.xaxis_ertrag
+        else:
+            x = self.xaxis_ertrag
+        y = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        ax = plt.subplot()
+        ax.set_xscale('log')
+        plt.grid(True, which='both')
+        ax.set_xticks(x)
+        ax.set_yticks(y)
+        formatter = FuncFormatter(lambda x, _: '{:.16g}'.format(x))
+        ax.get_xaxis().set_major_formatter(formatter)
+        plt.plot(x, self.M_prozent_0_32)
+        plt.show()
+
+    def calculate_data(self):
+        file = open("storage/"+str(self.name)+".txt", "r")
+        with open("storage/"+str(self.name)+".txt", "r") as file:
+            data_raw = file.read().splitlines()
+        self.data = []
+        for data in data_raw:
+            try:
+                dataf = float(data)
+                self.data.append(dataf)
+            except ValueError:
+                self.data.append(data)
+        # Berechnung der Massenprozente
+        self.Einwaage_0_32 = self.data[13]
+        self.Einwaage_0_4 = self.data[31]
+        self.Einwaage_4_16 = self.data[43]
+        self.Einwaage_16_32 = self.data[55]
+        self.M_prozent_0_32 = []
+        self.M_prozent_0_4 = []
+        self.M_prozent_4_16 = []
+        self.M_prozent_16_32 = []
+        if self.checkVar0_32.get() == 1:
+            for x in range(15, 28):
+                try:
+                    self.M_prozent_0_32.append((self.data[x]/self.Einwaage_0_32)*100)
+                except ZeroDivisionError:
+                    self.M_prozent_0_32.append(None)
+            try:
+                self.M_prozent_0_32.append((self.data[29]/self.Einwaage_0_32)*100)
+            except ZeroDivisionError:
+                mBox.showinfo("", "Keine Einwaage für Ertrag 0/32")
+        if self.checkVar0_4.get() == 1:
+            for x in range(33, 40):
+                try:
+                    self.M_prozent_0_4.append((self.data[x]/self.Einwaage_0_4)*100)
+                except ZeroDivisionError:
+                    self.M_prozent_0_4.append(None)
+            try:
+                self.M_prozent_0_4.append((self.data[41]/self.Einwaage_0_4)*100)
+            except ZeroDivisionError:
+                mBox.showinfo("", "Keine Einwaage für Sand 0/4")
+        if self.checkVar4_16.get() == 1:
+            for x in range(45, 52):
+                try:
+                    self.M_prozent_4_16.append((self.data[x]/self.Einwaage_4_16)*100)
+                except ZeroDivisionError:
+                    self.M_prozent_4_16.append(None)
+            try:
+                self.M_prozent_4_16.append((self.data[53]/self.Einwaage_4_16)*100)
+            except ZeroDivisionError:
+                mBox.showinfo("", "Keine Einwaage für Kies 4/16")
+        if self.checkVar16_32.get() == 1:
+            for x in range(57, 62):
+                try:
+                    self.M_prozent_16_32.append((self.data[x]/self.Einwaage_16_32)*100)
+                except ZeroDivisionError:
+                    self.M_prozent_16_32.append(None)
+            try:
+                self.M_prozent_16_32.append((self.data[63]/self.Einwaage_16_32)*100)
+            except ZeroDivisionError:
+                mBox.showinfo("", "Keine Einwaage für Kies 16/32")
+        self.create_plot()
+
     def create_file(self):
         t = self.test_v()
         if t == 0:
-            file = self.test_file()
-            # Berechnungen
-            self.auswage2 = self.sand_eingabe[0].get()+self.sand_eingabe[1].get() +\
-                self.sand_eingabe[2].get()+self.sand_eingabe[3].get() +\
-                self.sand_eingabe[4].get() + self.sand_eingabe[5].get() +\
-                self.sand_eingabe[6].get()
-            self._var_sand_8 = self.var_trocken2.get() - self.auswage2
-            Daten = {1: self.probe_nr.get(), 2: date.today(), 3: self.probe_t.get(),
-                     4: self.aufstr.get(), 5: self.aufgabemasse1.get(),
-                     6: self.aufgabebandv1.get(), 7: self.aufgabemasse2.get(),
-                     7: self.aufgabebandv2.get(), 8: self.b1.get(), 9: self.b2.get(),
-                     10: self.vdouble.get(), 11: self.motor.get(),
-                     12: self.var_feucht2.get(), 13: self.var_trocken2.get(),
-                     14: self.calc_eigenfeuchte2.get(), 15: self.sand_eingabe[0].get(),
-                     16: self.sand_eingabe[1].get(), 17: self.sand_eingabe[2].get(),
-                     18: self.sand_eingabe[3].get(), 19: self.sand_eingabe[4].get(),
-                     20: self.sand_eingabe[5].get(), 21: self.sand_eingabe[6].get(),
-                     22: self._var_sand_8, 23: self.auswage2}
-
-    def clickMe(self):
-
-        self.action.configure(text='Hello ' + self.name.get())
-        # ... more callback methods
+            file, x = self.test_file()
+            if x != 0:
+                # Berechnungen
+                self.auswage_ertrag = self.ertrag_eingabe[0].get()+self.ertrag_eingabe[1].get() +\
+                    self.ertrag_eingabe[2].get()+self.ertrag_eingabe[3].get() +\
+                    self.ertrag_eingabe[4].get() + self.ertrag_eingabe[5].get() +\
+                    self.ertrag_eingabe[6].get() + self.ertrag_eingabe[7].get() +\
+                    self.ertrag_eingabe[8].get() + self.ertrag_eingabe[9].get() +\
+                    self.ertrag_eingabe[10].get() + self.ertrag_eingabe[11].get() +\
+                    self.ertrag_eingabe[12].get()
+                self._var_ertrag_verlust = self.var_trocken1.get() - self.auswage_ertrag
+                self.var_eigenfeuchte_ertrag = self.var_feucht1.get() - self.var_trocken1.get()
+                self.auswage2 = self.sand_eingabe[0].get()+self.sand_eingabe[1].get() +\
+                    self.sand_eingabe[2].get()+self.sand_eingabe[3].get() +\
+                    self.sand_eingabe[4].get() + self.sand_eingabe[5].get() +\
+                    self.sand_eingabe[6].get()
+                self._var_sand_verlust = self.var_trocken2.get() - self.auswage2
+                self.var_eigenfeuchte2 = self.var_feucht2.get() - self.var_trocken2.get()
+                self.auswage_kies4_16 = self.kies4_16_eingabe[0].get()+self.kies4_16_eingabe[1].get() +\
+                    self.kies4_16_eingabe[2].get()+self.kies4_16_eingabe[3].get() +\
+                    self.kies4_16_eingabe[4].get()+self.kies4_16_eingabe[5].get() +\
+                    self.kies4_16_eingabe[6].get()
+                self._var_kies4_16_verlust = self.var_trocken3.get() - self.auswage_kies4_16
+                self.var_eigenfeuchte_kies4_16 = self.var_feucht3.get() - self.var_trocken3.get()
+                self.auswage_kies16_32 = self.kies16_32_eingabe[0].get()+self.kies16_32_eingabe[1].get() +\
+                    self.kies16_32_eingabe[2].get()+self.kies16_32_eingabe[3].get() +\
+                    self.kies16_32_eingabe[4].get()
+                self._var_kies16_32_verlust = self.var_trocken4.get() - self.auswage_kies16_32
+                self.var_eigenfeuchte_kies16_32 = self.var_feucht4.get() - self.var_trocken4.get()
+                Daten = {1: self.probe_nr.get(),
+                         2: date.today(),
+                         3: self.probe_t.get(),
+                         4: self.aufstr.get(),
+                         5: self.b1.get(),
+                         6: self.b2.get(),
+                         7: self.motor.get(),
+                         8: self.aufgabemasse1.get(),
+                         9: self.aufgabebandv1.get(),
+                         10: self.aufgabemasse2.get(),
+                         11: self.aufgabebandv2.get(),
+                         12: self.vdouble.get(),
+                         13: self.var_feucht1.get(),
+                         14: self.var_trocken1.get(),
+                         15: self.var_eigenfeuchte_ertrag,
+                         16: self.ertrag_eingabe[0].get(),
+                         17: self.ertrag_eingabe[1].get(),
+                         18: self.ertrag_eingabe[2].get(),
+                         19: self.ertrag_eingabe[3].get(),
+                         20: self.ertrag_eingabe[4].get(),
+                         21: self.ertrag_eingabe[5].get(),
+                         22: self.ertrag_eingabe[6].get(),
+                         23: self.ertrag_eingabe[7].get(),
+                         24: self.ertrag_eingabe[8].get(),
+                         25: self.ertrag_eingabe[9].get(),
+                         26: self.ertrag_eingabe[10].get(),
+                         27: self.ertrag_eingabe[11].get(),
+                         28: self.ertrag_eingabe[12].get(),
+                         29: self._var_ertrag_verlust,
+                         30: self.auswage_ertrag,
+                         31: self.var_feucht2.get(),
+                         32: self.var_trocken2.get(),
+                         33: self.var_eigenfeuchte2,
+                         34: self.sand_eingabe[0].get(),
+                         35: self.sand_eingabe[1].get(),
+                         36: self.sand_eingabe[2].get(),
+                         37: self.sand_eingabe[3].get(),
+                         38: self.sand_eingabe[4].get(),
+                         39: self.sand_eingabe[5].get(),
+                         40: self.sand_eingabe[6].get(),
+                         41: self._var_sand_verlust,
+                         42: self.auswage2,
+                         43: self.var_feucht3.get(),
+                         44: self.var_trocken3.get(),
+                         45: self.var_eigenfeuchte_kies4_16,
+                         46: self.kies4_16_eingabe[0].get(),
+                         47: self.kies4_16_eingabe[1].get(),
+                         48: self.kies4_16_eingabe[2].get(),
+                         49: self.kies4_16_eingabe[3].get(),
+                         50: self.kies4_16_eingabe[4].get(),
+                         51: self.kies4_16_eingabe[5].get(),
+                         52: self.kies4_16_eingabe[6].get(),
+                         53: self._var_kies4_16_verlust,
+                         54: self.auswage_kies4_16,
+                         55: self.var_feucht4.get(),
+                         56: self.var_trocken4.get(),
+                         57: self.var_eigenfeuchte_kies16_32,
+                         58: self.kies16_32_eingabe[0].get(),
+                         59: self.kies16_32_eingabe[1].get(),
+                         60: self.kies16_32_eingabe[2].get(),
+                         61: self.kies16_32_eingabe[3].get(),
+                         62: self.kies16_32_eingabe[4].get(),
+                         63: self._var_kies16_32_verlust,
+                         64: self.auswage_kies16_32,
+                         }
+                for key, value in Daten.items():
+                    file.write(str(value)+"\n")
+                file.close()
+                self.calculate_data()
+            else:
+                pass
 
     def createWidgets(self):
 
@@ -185,6 +361,34 @@ class OOP():
         82
         tab1 = ttk.Frame(tabControl)
         tabControl.add(tab1, text='Ertrag 0/32')
+        Eigenfeuchte1 = ttk.Label(tab1, text="Eigenfeuchte:")
+        Eigenfeuchte1.grid(column=0, row=0)
+        Einwaage_feucht1 = ttk.Label(tab1, text="Einwaage feucht:")
+        Einwaage_feucht1.grid(column=0, row=1)
+        self.var_feucht1 = tk.DoubleVar()
+        E_feucht1 = ttk.Entry(tab1, width=15, textvariable=self.var_feucht1)
+        E_feucht1.grid(column=1, row=1)
+        Einwaage_trocken1 = ttk.Label(tab1, text="Einwaage trocken:")
+        Einwaage_trocken1.grid(column=0, row=2)
+        self.var_trocken1 = tk.DoubleVar()
+        E_trocken1 = ttk.Entry(tab1, width=15, textvariable=self.var_trocken1)
+        E_trocken1.grid(column=1, row=2)
+        Kornung = {1: ">32", 2: "22-32", 3: "16-22", 4: "11-16", 5: "8-11",
+                   6: "5.6-8", 7: "4-5.6", 8: "2-4", 9: "1-2", 10: "0,5-1",
+                   11: "0,25-0,5", 12: "0,125-0,25", 13: "0,063-0,125"}
+        spalte = 1
+        reihe = 4
+        self.ertrag_eingabe = []
+        for key, Korn in Kornung.items():
+            label = ttk.Label(tab1, text=Korn)
+            label.grid(column=spalte, row=reihe)
+            spalte = spalte + 1
+            var = tk.DoubleVar()
+            self.ertrag_eingabe.append(var)
+            Eingabe = ttk.Entry(tab1, width=15, textvariable=var)
+            Eingabe.grid(column=spalte, row=reihe)
+            spalte = spalte - 1
+            reihe = reihe + 1
 
         tab2 = ttk.Frame(tabControl)
         tabControl.add(tab2, text='0/4 Sand')  # Create a tab
@@ -201,7 +405,6 @@ class OOP():
         self.var_trocken2 = tk.DoubleVar()
         E_trocken2 = ttk.Entry(tab2, width=15, textvariable=self.var_trocken2)
         E_trocken2.grid(column=1, row=2)
-        self.var_eigenfeuchte2 = self.var_feucht2.get() - self.var_trocken2.get()
         Kornung = {1: ">4", 2: "2-4", 3: "1-2", 4: "0,5-1", 5: "0,25-0,5", 6: "0,125-0,25",
                    7: "0,063-0,125"}
         spalte = 1
@@ -219,9 +422,65 @@ class OOP():
             reihe = reihe + 1
 
         tab3 = ttk.Frame(tabControl)
-        tabControl.add(tab3, text='4/32 Kies')  # Create second tab
+        tabControl.add(tab3, text='4/16 Kies')
+        Eigenfeuchte3 = ttk.Label(tab3, text="Eigenfeuchte:")
+        Eigenfeuchte3.grid(column=0, row=0)
+        Einwaage_feucht3 = ttk.Label(tab3, text="Einwaage feucht:")
+        Einwaage_feucht3.grid(column=0, row=1)
+        self.var_feucht3 = tk.DoubleVar()
+        E_feucht3 = ttk.Entry(tab3, width=15, textvariable=self.var_feucht3)
+        E_feucht3.grid(column=1, row=1)
+        Einwaage_trocken3 = ttk.Label(tab3, text="Einwaage trocken:")
+        Einwaage_trocken3.grid(column=0, row=2)
+        self.var_trocken3 = tk.DoubleVar()
+        E_trocken3 = ttk.Entry(tab3, width=15, textvariable=self.var_trocken3)
+        E_trocken3.grid(column=1, row=2)
+        Kornung = {1: ">16", 2: "11-16", 3: "8-11",
+                   4: "5.6-8", 5: "4-5.6", 6: "2-4", 7: "1-2"}
+        spalte = 1
+        reihe = 4
+        self.kies4_16_eingabe = []
+        for key, Korn in Kornung.items():
+            label = ttk.Label(tab3, text=Korn)
+            label.grid(column=spalte, row=reihe)
+            spalte = spalte + 1
+            var = tk.DoubleVar()
+            self.kies4_16_eingabe.append(var)
+            Eingabe = ttk.Entry(tab3, width=15, textvariable=var)
+            Eingabe.grid(column=spalte, row=reihe)
+            spalte = spalte - 1
+            reihe = reihe + 1
+          # Create second tab
         # Add second tab
+        tab4 = ttk.Frame(tabControl)
+        tabControl.add(tab4, text='16/32 Kies')
         tabControl.grid(column=0, row=7)
+        Eigenfeuchte4 = ttk.Label(tab4, text="Eigenfeuchte:")
+        Eigenfeuchte4.grid(column=0, row=0)
+        Einwaage_feucht4 = ttk.Label(tab4, text="Einwaage feucht:")
+        Einwaage_feucht4.grid(column=0, row=1)
+        self.var_feucht4 = tk.DoubleVar()
+        E_feucht4 = ttk.Entry(tab4, width=15, textvariable=self.var_feucht4)
+        E_feucht4.grid(column=1, row=1)
+        Einwaage_trocken4 = ttk.Label(tab4, text="Einwaage trocken:")
+        Einwaage_trocken4.grid(column=0, row=2)
+        self.var_trocken4 = tk.DoubleVar()
+        E_trocken5 = ttk.Entry(tab4, width=15, textvariable=self.var_trocken4)
+        E_trocken5.grid(column=1, row=2)
+        Kornung = {1: ">32", 2: "22-32", 3: "16-22", 4: "11-16", 5: "8-11"}
+        spalte = 1
+        reihe = 4
+        self.kies16_32_eingabe = []
+        for key, Korn in Kornung.items():
+            label = ttk.Label(tab4, text=Korn)
+            label.grid(column=spalte, row=reihe)
+            spalte = spalte + 1
+            var = tk.DoubleVar()
+            self.kies16_32_eingabe.append(var)
+            Eingabe = ttk.Entry(tab4, width=15, textvariable=var)
+            Eingabe.grid(column=spalte, row=reihe)
+            spalte = spalte - 1
+            reihe = reihe + 1
 
 
         # ======================
