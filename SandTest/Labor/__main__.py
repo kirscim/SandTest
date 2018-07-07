@@ -174,7 +174,7 @@ class OOP():
         ax = plt.subplot()
         if self.checkVar0_4.get() == 1:
             x = self.xaxis_sand
-            plt.axis([0, 5, 0, 100])
+            plt.axis([0, 6, 0, 100])
             ax.set_xscale('linear')
             if self.checkVar0_32.get()+self.checkVar4_16.get()+self.checkVar16_32.get() >= 1:
                 x = self.xaxis_ertrag
@@ -193,24 +193,39 @@ class OOP():
         ax.get_xaxis().set_major_formatter(formatter)
         if self.checkVar0_32.get() == 1:
             x = self.xaxis_ertrag
-            self.M_prozent_0_32.reverse()
-            plt.plot(x, self.M_prozent_0_32, 'b', label='Ertrag 0/32')
+            M0_32 = []
+            for n in range(len(self.M_prozent_0_32)):
+                M0_32.append(sum(self.M_prozent_0_32))
+                self.M_prozent_0_32.pop(0)
+            M0_32.reverse()
+            plt.plot(x, M0_32, 'b', label='Ertrag 0/32')
         if self.checkVar0_4.get() == 1:
-            self.M_prozent_0_4.reverse()
+            M0_4 = []
+            for n in range(len(self.M_prozent_0_4)):
+                M0_4.append(sum(self.M_prozent_0_4))
+                self.M_prozent_0_4.pop(0)
+            M0_4.reverse()
             x = self.xaxis_sand
-            plt.plot(x, self.M_prozent_0_4, 'g', label='Sand 0/4')
+            plt.plot(x, M0_4, 'g', label='Sand 0/4')
         if self.checkVar4_16.get() == 1:
-            self.M_prozent_4_16.reverse()
+            M4_16 = []
+            for n in range(len(self.M_prozent_4_16)):
+                M4_16.append(sum(self.M_prozent_4_16))
+                self.M_prozent_4_16.pop(0)
+            M4_16.reverse()
             x = self.xaxis_4_16
-            plt.plot(x, self.M_prozent_4_16, 'r', label='Rücklauf 4/16')
+            plt.plot(x, M4_16, 'r', label='Rücklauf 4/16')
         if self.checkVar16_32.get() == 1:
-            self.M_prozent_16_32.reverse()
+            M16_32 = []
+            for n in range(len(self.M_prozent_16_32)):
+                M16_32.append(sum(self.M_prozent_16_32))
+                self.M_prozent_16_32.pop(0)
+            M16_32.reverse()
             x = self.xaxis_ertrag
-            print(x, self.M_prozent_16_32)
-            plt.plot(x, self.M_prozent_16_32, 'y', label='Rücklauf 16/32')
+            plt.plot(x, M16_32, 'y', label='Rücklauf 16/32')
         plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                    ncol=2, mode="expand", borderaxespad=0.)
-        plt.show()
+        plt.savefig("images/"+str(self.name)+".png")
 
     def calculate_data(self):
         file = open("storage/"+str(self.name)+".txt", "r")
@@ -527,7 +542,6 @@ class OOP():
             Eingabe.grid(column=spalte, row=reihe)
             spalte = spalte - 1
             reihe = reihe + 1
-
 
         # ======================
         # Start GUI
