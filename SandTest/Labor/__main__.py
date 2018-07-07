@@ -169,22 +169,47 @@ class OOP():
 
     def create_plot(self):
         self.xaxis_ertrag = [0.063, 0.125, 0.25, 0.5, 1, 2, 4, 5.6, 8, 11, 16, 22, 32, 45]
-        self.xaxis_sand = [0.063, 0.125, 0.25, 0.5, 1, 2, 4]
+        self.xaxis_sand = [0.063, 0.125, 0.25, 0.5, 1, 2, 4, 5.6]
+        self.xaxis_4_16 = [0.063, 0.125, 0.25, 0.5, 1, 2, 4, 5.6, 8, 11, 16, 22]
+        ax = plt.subplot()
         if self.checkVar0_4.get() == 1:
             x = self.xaxis_sand
+            plt.axis([0, 5, 0, 100])
+            ax.set_xscale('linear')
             if self.checkVar0_32.get()+self.checkVar4_16.get()+self.checkVar16_32.get() >= 1:
                 x = self.xaxis_ertrag
+                ax.set_xscale('log')
+                plt.axis([0.06, 45, 0, 100])
+                ax.set_xticks(x)
         else:
             x = self.xaxis_ertrag
+            ax.set_xscale('log')
+            plt.axis([0.06, 45, 0, 100])
+            ax.set_xticks(x)
         y = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        ax = plt.subplot()
-        ax.set_xscale('log')
         plt.grid(True, which='both')
-        ax.set_xticks(x)
         ax.set_yticks(y)
         formatter = FuncFormatter(lambda x, _: '{:.16g}'.format(x))
         ax.get_xaxis().set_major_formatter(formatter)
-        plt.plot(x, self.M_prozent_0_32)
+        if self.checkVar0_32.get() == 1:
+            x = self.xaxis_ertrag
+            self.M_prozent_0_32.reverse()
+            plt.plot(x, self.M_prozent_0_32, 'b', label='Ertrag 0/32')
+        if self.checkVar0_4.get() == 1:
+            self.M_prozent_0_4.reverse()
+            x = self.xaxis_sand
+            plt.plot(x, self.M_prozent_0_4, 'g', label='Sand 0/4')
+        if self.checkVar4_16.get() == 1:
+            self.M_prozent_4_16.reverse()
+            x = self.xaxis_4_16
+            plt.plot(x, self.M_prozent_4_16, 'r', label='Rücklauf 4/16')
+        if self.checkVar16_32.get() == 1:
+            self.M_prozent_16_32.reverse()
+            x = self.xaxis_ertrag
+            print(x, self.M_prozent_16_32)
+            plt.plot(x, self.M_prozent_16_32, 'y', label='Rücklauf 16/32')
+        plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                   ncol=2, mode="expand", borderaxespad=0.)
         plt.show()
 
     def calculate_data(self):
@@ -202,7 +227,7 @@ class OOP():
         self.Einwaage_0_32 = self.data[13]
         self.Einwaage_0_4 = self.data[31]
         self.Einwaage_4_16 = self.data[43]
-        self.Einwaage_16_32 = self.data[55]
+        self.Einwaage_16_32 = self.data[59]
         self.M_prozent_0_32 = []
         self.M_prozent_0_4 = []
         self.M_prozent_4_16 = []
@@ -214,7 +239,7 @@ class OOP():
                 except ZeroDivisionError:
                     self.M_prozent_0_32.append(None)
             try:
-                self.M_prozent_0_32.append((self.data[29]/self.Einwaage_0_32)*100)
+                self.M_prozent_0_32.append((self.data[28]/self.Einwaage_0_32)*100)
             except ZeroDivisionError:
                 mBox.showinfo("", "Keine Einwaage für Ertrag 0/32")
         if self.checkVar0_4.get() == 1:
@@ -224,27 +249,27 @@ class OOP():
                 except ZeroDivisionError:
                     self.M_prozent_0_4.append(None)
             try:
-                self.M_prozent_0_4.append((self.data[41]/self.Einwaage_0_4)*100)
+                self.M_prozent_0_4.append((self.data[40]/self.Einwaage_0_4)*100)
             except ZeroDivisionError:
                 mBox.showinfo("", "Keine Einwaage für Sand 0/4")
         if self.checkVar4_16.get() == 1:
-            for x in range(45, 52):
+            for x in range(45, 56):
                 try:
                     self.M_prozent_4_16.append((self.data[x]/self.Einwaage_4_16)*100)
                 except ZeroDivisionError:
                     self.M_prozent_4_16.append(None)
             try:
-                self.M_prozent_4_16.append((self.data[53]/self.Einwaage_4_16)*100)
+                self.M_prozent_4_16.append((self.data[56]/self.Einwaage_4_16)*100)
             except ZeroDivisionError:
                 mBox.showinfo("", "Keine Einwaage für Kies 4/16")
         if self.checkVar16_32.get() == 1:
-            for x in range(57, 62):
+            for x in range(61, 74):
                 try:
                     self.M_prozent_16_32.append((self.data[x]/self.Einwaage_16_32)*100)
                 except ZeroDivisionError:
                     self.M_prozent_16_32.append(None)
             try:
-                self.M_prozent_16_32.append((self.data[63]/self.Einwaage_16_32)*100)
+                self.M_prozent_16_32.append((self.data[74]/self.Einwaage_16_32)*100)
             except ZeroDivisionError:
                 mBox.showinfo("", "Keine Einwaage für Kies 16/32")
         self.create_plot()
@@ -273,12 +298,18 @@ class OOP():
                 self.auswage_kies4_16 = self.kies4_16_eingabe[0].get()+self.kies4_16_eingabe[1].get() +\
                     self.kies4_16_eingabe[2].get()+self.kies4_16_eingabe[3].get() +\
                     self.kies4_16_eingabe[4].get()+self.kies4_16_eingabe[5].get() +\
-                    self.kies4_16_eingabe[6].get()
+                    self.kies4_16_eingabe[6].get()+self.kies4_16_eingabe[7].get() +\
+                    self.kies4_16_eingabe[8].get()+self.kies4_16_eingabe[9].get() +\
+                    self.kies4_16_eingabe[10].get()
                 self._var_kies4_16_verlust = self.var_trocken3.get() - self.auswage_kies4_16
                 self.var_eigenfeuchte_kies4_16 = self.var_feucht3.get() - self.var_trocken3.get()
                 self.auswage_kies16_32 = self.kies16_32_eingabe[0].get()+self.kies16_32_eingabe[1].get() +\
                     self.kies16_32_eingabe[2].get()+self.kies16_32_eingabe[3].get() +\
-                    self.kies16_32_eingabe[4].get()
+                    self.kies16_32_eingabe[4].get()+self.kies16_32_eingabe[5].get() +\
+                    self.kies16_32_eingabe[6].get()+self.kies16_32_eingabe[7].get() +\
+                    self.kies16_32_eingabe[8].get()+self.kies16_32_eingabe[9].get() +\
+                    self.kies16_32_eingabe[10].get()+self.kies16_32_eingabe[11].get() +\
+                    self.kies16_32_eingabe[12].get()
                 self._var_kies16_32_verlust = self.var_trocken4.get() - self.auswage_kies16_32
                 self.var_eigenfeuchte_kies16_32 = self.var_feucht4.get() - self.var_trocken4.get()
                 Daten = {1: self.probe_nr.get(),
@@ -333,18 +364,30 @@ class OOP():
                          50: self.kies4_16_eingabe[4].get(),
                          51: self.kies4_16_eingabe[5].get(),
                          52: self.kies4_16_eingabe[6].get(),
-                         53: self._var_kies4_16_verlust,
-                         54: self.auswage_kies4_16,
-                         55: self.var_feucht4.get(),
-                         56: self.var_trocken4.get(),
-                         57: self.var_eigenfeuchte_kies16_32,
-                         58: self.kies16_32_eingabe[0].get(),
-                         59: self.kies16_32_eingabe[1].get(),
-                         60: self.kies16_32_eingabe[2].get(),
-                         61: self.kies16_32_eingabe[3].get(),
-                         62: self.kies16_32_eingabe[4].get(),
-                         63: self._var_kies16_32_verlust,
-                         64: self.auswage_kies16_32,
+                         53: self.kies4_16_eingabe[7].get(),
+                         54: self.kies4_16_eingabe[8].get(),
+                         55: self.kies4_16_eingabe[9].get(),
+                         56: self.kies4_16_eingabe[10].get(),
+                         57: self._var_kies4_16_verlust,
+                         58: self.auswage_kies4_16,
+                         59: self.var_feucht4.get(),
+                         60: self.var_trocken4.get(),
+                         61: self.var_eigenfeuchte_kies16_32,
+                         62: self.kies16_32_eingabe[0].get(),
+                         63: self.kies16_32_eingabe[1].get(),
+                         64: self.kies16_32_eingabe[2].get(),
+                         65: self.kies16_32_eingabe[3].get(),
+                         66: self.kies16_32_eingabe[4].get(),
+                         67: self.kies16_32_eingabe[5].get(),
+                         68: self.kies16_32_eingabe[6].get(),
+                         69: self.kies16_32_eingabe[7].get(),
+                         70: self.kies16_32_eingabe[8].get(),
+                         71: self.kies16_32_eingabe[9].get(),
+                         72: self.kies16_32_eingabe[10].get(),
+                         73: self.kies16_32_eingabe[11].get(),
+                         74: self.kies16_32_eingabe[12].get(),
+                         75: self._var_kies16_32_verlust,
+                         76: self.auswage_kies16_32,
                          }
                 for key, value in Daten.items():
                     file.write(str(value)+"\n")
@@ -436,7 +479,8 @@ class OOP():
         E_trocken3 = ttk.Entry(tab3, width=15, textvariable=self.var_trocken3)
         E_trocken3.grid(column=1, row=2)
         Kornung = {1: ">16", 2: "11-16", 3: "8-11",
-                   4: "5.6-8", 5: "4-5.6", 6: "2-4", 7: "1-2"}
+                   4: "5.6-8", 5: "4-5.6", 6: "2-4", 7: "1-2", 8: "0,5-1",
+                   9: "0,25-0,5", 10: "0,125-0,25", 11: "0,063-0,125"}
         spalte = 1
         reihe = 4
         self.kies4_16_eingabe = []
@@ -467,7 +511,9 @@ class OOP():
         self.var_trocken4 = tk.DoubleVar()
         E_trocken5 = ttk.Entry(tab4, width=15, textvariable=self.var_trocken4)
         E_trocken5.grid(column=1, row=2)
-        Kornung = {1: ">32", 2: "22-32", 3: "16-22", 4: "11-16", 5: "8-11"}
+        Kornung = {1: ">32", 2: "22-32", 3: "16-22", 4: "11-16", 5: "8-11",
+                   6: "5.6-8", 7: "4-5.6", 8: "2-4", 9: "1-2", 10: "0,5-1",
+                   11: "0,25-0,5", 12: "0,125-0,25", 13: "0,063-0,125"}
         spalte = 1
         reihe = 4
         self.kies16_32_eingabe = []
