@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import tkinter as tk
 from tkinter import ttk
 from datetime import date
@@ -5,6 +7,7 @@ import os
 from tkinter import messagebox as mBox
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from fpdf import FPDF
 
 
 class OOP():
@@ -165,7 +168,202 @@ class OOP():
             return x
 
     def create_pdf_file(self):
-        pass
+        pdf = FPDF('P', 'mm', 'A4')
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(65)
+        pdf.cell(60, 10, 'Siebanalyse Kieswerk Oberbrunn', 0, 2, 'C')
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(100)
+        pdf.cell(30, 5, 'Datum:', 0, 2, 'R')
+        pdf.cell(30, 5, self.data[1], 0, 2, 'R')
+        pdf.cell(30, 5, self.data[2], 0, 1, 'R')
+        pdf.cell(40, 5, 'Brechereinstellungen:', 1, 0, 'C')
+        pdf.cell(98)
+        pdf.cell(30, 5, 'Aufgabe:', 1, 1, 'C')
+        pdf.cell(30, 5, 'Schleudertisch:', 0, 0, 'R')
+        pdf.cell(30, 5, str(self.data[4]), 0, 0, 'L')
+        pdf.cell(75)
+        pdf.cell(30, 5, self.data[3], 0, 1, 'C')
+        pdf.cell(30, 5, 'Schleuderplatten:', 0, 0, 'R')
+        pdf.cell(30, 5, self.data[5], 0, 0, 'L')
+        pdf.cell(75)
+        pdf.cell(30, 5, 'feine Gesteinsart', 0, 1, 'C')
+        pdf.cell(30, 5, 'Testgeschwindigkeit:', 0, 0, 'R')
+        pdf.cell(30, 5, str(self.data[11]), 0, 0, 'L')
+        pdf.cell(75)
+        pdf.cell(30, 5, 'Kalkstein', 0, 1, 'C')
+        pdf.cell(30, 5, 'Motor:', 0, 0, 'R')
+        pdf.cell(30, 5, self.data[6], 0, 1, 'L')
+        pdf.cell(10, 5, '', 0, 1)
+        pdf.cell(40, 5, 'Aufgabe in [t/h]:', 1, 0, 'C')
+        pdf.cell(20, 5, '', 1, 0, 'L')
+        pdf.cell(30)
+        pdf.cell(40, 5, 'Ertrag Sand in [t/h]:', 1, 0, 'C')
+        pdf.cell(20, 5, '', 1, 1, 'L')
+        pdf.cell(10, 5, '', 0, 1)
+        pdf.cell(30)
+        pdf.set_font('Arial', 'B', 10)
+        pdf.cell(30, 5, 'Ertrag 0/32')
+        pdf.cell(30, 5, 'Sand 0/4')
+        pdf.cell(30, 5, 'Rücklauf 4/16')
+        pdf.cell(30, 5, 'Rücklauf 16/32', 0, 1)
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(30, 5, 'Einwaage feucht:', 0, 0)
+        pdf.cell(20, 5, str(self.data[12])+'g', 1)
+        pdf.cell(20, 5)
+        pdf.cell(20, 5, str(self.data[30])+'g', 1)
+        pdf.cell(20)
+        pdf.cell(20, 5, str(self.data[42])+'g', 1)
+        pdf.cell(20)
+        pdf.cell(20, 5, str(self.data[58])+'g', 1, 1)
+        pdf.cell(30, 5, 'Einwaage trocken:', 0, 0)
+        pdf.cell(20, 5, str(self.data[13])+'g', 1)
+        pdf.cell(20, 5)
+        pdf.cell(20, 5, str(self.data[31])+'g', 1)
+        pdf.cell(20)
+        pdf.cell(20, 5, str(self.data[43])+'g', 1)
+        pdf.cell(20)
+        pdf.cell(20, 5, str(self.data[59])+'g', 1, 1)
+        pdf.cell(30, 5, 'Eigenfeuchte:', 0, 0)
+        pdf.cell(20, 5, str(self.data[14])+'g', 1)
+        pdf.cell(20, 5, str(self.eigen_p_ertrag)+'%', 1)
+        pdf.cell(20, 5, str(self.data[32])+'g', 1)
+        pdf.cell(20, 5, str(self.eigen_p_sand)+'%', 1)
+        pdf.cell(20, 5, str(self.data[44])+'g', 1)
+        pdf.cell(20, 5, str(self.eigen_p_4_16)+'%', 1)
+        pdf.cell(20, 5, str(self.data[60])+'g', 1)
+        pdf.cell(20, 5, str(self.eigen_p_16_32)+'%', 1, 1)
+        pdf.cell(30, 5, 'Kornzusammensetzung in [mm] und [M.%]', 0, 1)
+        pdf.cell(30, 5, '>32')
+        pdf.cell(20, 5, str(self.data[15])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-14])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[61])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-14])+'%', 1, 1)
+        pdf.cell(30, 5, '22-32')
+        pdf.cell(20, 5, str(self.data[16])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-13])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[62])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-13])+'%', 1, 1)
+        pdf.cell(30, 5, '16-22')
+        pdf.cell(20, 5, str(self.data[17])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-12])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[45])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-12])+'%', 1)
+        pdf.cell(20, 5, str(self.data[63])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-12])+'%', 1, 1)
+        pdf.cell(30, 5, '11-16')
+        pdf.cell(20, 5, str(self.data[18])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-11])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[46])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-11])+'%', 1)
+        pdf.cell(20, 5, str(self.data[64])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-11])+'%', 1, 1)
+        pdf.cell(30, 5, '8-11')
+        pdf.cell(20, 5, str(self.data[19])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-10])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[47])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-10])+'%', 1)
+        pdf.cell(20, 5, str(self.data[65])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-10])+'%', 1, 1)
+        pdf.cell(30, 5, '5.6-8')
+        pdf.cell(20, 5, str(self.data[20])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-9])+'%', 1)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, '', 0)
+        pdf.cell(20, 5, str(self.data[48])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-9])+'%', 1)
+        pdf.cell(20, 5, str(self.data[66])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-9])+'%', 1, 1)
+        pdf.cell(30, 5, '4-5.6')
+        pdf.cell(20, 5, str(self.data[21])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-8])+'%', 1)
+        pdf.cell(20, 5, str(self.data[33])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-8])+'%', 1)
+        pdf.cell(20, 5, str(self.data[49])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-8])+'%', 1)
+        pdf.cell(20, 5, str(self.data[67])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-8])+'%', 1, 1)
+        pdf.cell(30, 5, '2-4')
+        pdf.cell(20, 5, str(self.data[22])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-7])+'%', 1)
+        pdf.cell(20, 5, str(self.data[34])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-7])+'%', 1)
+        pdf.cell(20, 5, str(self.data[50])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-7])+'%', 1)
+        pdf.cell(20, 5, str(self.data[68])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-7])+'%', 1, 1)
+        pdf.cell(30, 5, '1-2')
+        pdf.cell(20, 5, str(self.data[23])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-6])+'%', 1)
+        pdf.cell(20, 5, str(self.data[35])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-6])+'%', 1)
+        pdf.cell(20, 5, str(self.data[51])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-6])+'%', 1)
+        pdf.cell(20, 5, str(self.data[69])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-6])+'%', 1, 1)
+        pdf.cell(30, 5, '0.5-1')
+        pdf.cell(20, 5, str(self.data[24])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-5])+'%', 1)
+        pdf.cell(20, 5, str(self.data[36])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-5])+'%', 1)
+        pdf.cell(20, 5, str(self.data[52])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-5])+'%', 1)
+        pdf.cell(20, 5, str(self.data[70])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-5])+'%', 1, 1)
+        pdf.cell(30, 5, '0.25-0.5')
+        pdf.cell(20, 5, str(self.data[25])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-4])+'%', 1)
+        pdf.cell(20, 5, str(self.data[37])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-4])+'%', 1)
+        pdf.cell(20, 5, str(self.data[53])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-4])+'%', 1)
+        pdf.cell(20, 5, str(self.data[71])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-4])+'%', 1, 1)
+        pdf.cell(30, 5, '0.125-0.25')
+        pdf.cell(20, 5, str(self.data[26])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-3])+'%', 1)
+        pdf.cell(20, 5, str(self.data[38])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-3])+'%', 1)
+        pdf.cell(20, 5, str(self.data[54])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-3])+'%', 1)
+        pdf.cell(20, 5, str(self.data[72])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-3])+'%', 1, 1)
+        pdf.cell(30, 5, '0.063-0.125')
+        pdf.cell(20, 5, str(self.data[27])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-2])+'%', 1)
+        pdf.cell(20, 5, str(self.data[39])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-2])+'%', 1)
+        pdf.cell(20, 5, str(self.data[55])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-2])+'%', 1)
+        pdf.cell(20, 5, str(self.data[73])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-2])+'%', 1, 1)
+        pdf.cell(30, 5, '<0.063')
+        pdf.cell(20, 5, str(self.data[28])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_ertrag[-1])+'%', 1)
+        pdf.cell(20, 5, str(self.data[40])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_sand[-1])+'%', 1)
+        pdf.cell(20, 5, str(self.data[56])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_4_16[-1])+'%', 1)
+        pdf.cell(20, 5, str(self.data[74])+'g', 1)
+        pdf.cell(20, 5, "{0: 3.1f}".format(self.p_16_32[-1])+'%', 1, 1)
+        pdf.set_font('Arial', 'B', 14)
+        pdf.image("images/"+str(self.name)+".png", x=40, w=140, type='PNG')
+        pdf.output("PDF/"+str(self.name)+".pdf", 'F')
 
     def create_plot(self):
         self.xaxis_ertrag = [0.063, 0.125, 0.25, 0.5, 1, 2, 4, 5.6, 8, 11, 16, 22, 32, 45]
@@ -191,41 +389,47 @@ class OOP():
         ax.set_yticks(y)
         formatter = FuncFormatter(lambda x, _: '{:.16g}'.format(x))
         ax.get_xaxis().set_major_formatter(formatter)
+        self.p_ertrag = self.M_prozent_0_32.copy()
+        self.p_sand = self.M_prozent_0_4.copy()
+        self.p_4_16 = self.M_prozent_4_16.copy()
+        self.p_16_32 = self.M_prozent_16_32.copy()
         if self.checkVar0_32.get() == 1:
             x = self.xaxis_ertrag
-            M0_32 = []
+            self.M0_32 = []
             for n in range(len(self.M_prozent_0_32)):
-                M0_32.append(sum(self.M_prozent_0_32))
+                self.M0_32.append(sum(self.M_prozent_0_32))
                 self.M_prozent_0_32.pop(0)
-            M0_32.reverse()
-            plt.plot(x, M0_32, 'b', label='Ertrag 0/32')
+            self.M0_32.reverse()
+            plt.plot(x, self.M0_32, 'b', label='Ertrag 0/32')
         if self.checkVar0_4.get() == 1:
-            M0_4 = []
+            self.M0_4 = []
             for n in range(len(self.M_prozent_0_4)):
-                M0_4.append(sum(self.M_prozent_0_4))
+                self.M0_4.append(sum(self.M_prozent_0_4))
                 self.M_prozent_0_4.pop(0)
-            M0_4.reverse()
+            self.M0_4.reverse()
             x = self.xaxis_sand
-            plt.plot(x, M0_4, 'g', label='Sand 0/4')
+            plt.plot(x, self.M0_4, 'g', label='Sand 0/4')
         if self.checkVar4_16.get() == 1:
-            M4_16 = []
+            self.M4_16 = []
             for n in range(len(self.M_prozent_4_16)):
-                M4_16.append(sum(self.M_prozent_4_16))
+                self.M4_16.append(sum(self.M_prozent_4_16))
                 self.M_prozent_4_16.pop(0)
-            M4_16.reverse()
+            self.M4_16.reverse()
             x = self.xaxis_4_16
-            plt.plot(x, M4_16, 'r', label='Rücklauf 4/16')
+            plt.plot(x, self.M4_16, 'r', label='Rücklauf 4/16')
         if self.checkVar16_32.get() == 1:
-            M16_32 = []
+            self.M16_32 = []
             for n in range(len(self.M_prozent_16_32)):
-                M16_32.append(sum(self.M_prozent_16_32))
+                self.M16_32.append(sum(self.M_prozent_16_32))
                 self.M_prozent_16_32.pop(0)
-            M16_32.reverse()
+            self.M16_32.reverse()
             x = self.xaxis_ertrag
-            plt.plot(x, M16_32, 'y', label='Rücklauf 16/32')
+            plt.plot(x, self.M16_32, 'y', label='Rücklauf 16/32')
         plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
                    ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig("images/"+str(self.name)+".png")
+        plt.clf()
+        self.create_pdf_file()
 
     def calculate_data(self):
         file = open("storage/"+str(self.name)+".txt", "r")
@@ -247,46 +451,50 @@ class OOP():
         self.M_prozent_0_4 = []
         self.M_prozent_4_16 = []
         self.M_prozent_16_32 = []
-        if self.checkVar0_32.get() == 1:
-            for x in range(15, 28):
-                try:
-                    self.M_prozent_0_32.append((self.data[x]/self.Einwaage_0_32)*100)
-                except ZeroDivisionError:
-                    self.M_prozent_0_32.append(None)
+        for x in range(15, 28):
             try:
-                self.M_prozent_0_32.append((self.data[28]/self.Einwaage_0_32)*100)
+                self.M_prozent_0_32.append((self.data[x]/self.Einwaage_0_32)*100)
             except ZeroDivisionError:
-                mBox.showinfo("", "Keine Einwaage für Ertrag 0/32")
-        if self.checkVar0_4.get() == 1:
-            for x in range(33, 40):
-                try:
-                    self.M_prozent_0_4.append((self.data[x]/self.Einwaage_0_4)*100)
-                except ZeroDivisionError:
-                    self.M_prozent_0_4.append(None)
+                self.M_prozent_0_32.append(0)
+        if self.checkVar0_32.get() == 1 and self.data[28] == 0:
+            mBox.showinfo('', 'Keine Einwaage für Ertrag 0/32')
+        try:
+            self.M_prozent_0_32.append((self.data[28]/self.Einwaage_0_32)*100)
+        except ZeroDivisionError:
+            self.M_prozent_0_32.append(0)
+        for x in range(33, 40):
             try:
-                self.M_prozent_0_4.append((self.data[40]/self.Einwaage_0_4)*100)
+                self.M_prozent_0_4.append((self.data[x]/self.Einwaage_0_4)*100)
             except ZeroDivisionError:
-                mBox.showinfo("", "Keine Einwaage für Sand 0/4")
-        if self.checkVar4_16.get() == 1:
-            for x in range(45, 56):
-                try:
-                    self.M_prozent_4_16.append((self.data[x]/self.Einwaage_4_16)*100)
-                except ZeroDivisionError:
-                    self.M_prozent_4_16.append(None)
+                self.M_prozent_0_4.append(0)
+        if self.checkVar0_4.get() == 1 and self.data[40] == 0:
+            mBox.showinfo('', 'Keine Einwaage für Sand 0/4')
+        try:
+            self.M_prozent_0_4.append((self.data[40]/self.Einwaage_0_4)*100)
+        except ZeroDivisionError:
+            self.M_prozent_0_4.append(0)
+        for x in range(45, 56):
             try:
-                self.M_prozent_4_16.append((self.data[56]/self.Einwaage_4_16)*100)
+                self.M_prozent_4_16.append((self.data[x]/self.Einwaage_4_16)*100)
             except ZeroDivisionError:
-                mBox.showinfo("", "Keine Einwaage für Kies 4/16")
-        if self.checkVar16_32.get() == 1:
-            for x in range(61, 74):
-                try:
-                    self.M_prozent_16_32.append((self.data[x]/self.Einwaage_16_32)*100)
-                except ZeroDivisionError:
-                    self.M_prozent_16_32.append(None)
+                self.M_prozent_4_16.append(0)
+        if self.checkVar4_16.get() == 1 and self.data[56] == 0:
+            mBox.showinfo('', 'Keine Einwaage für Rücklauf 4/16')
+        try:
+            self.M_prozent_4_16.append((self.data[56]/self.Einwaage_4_16)*100)
+        except ZeroDivisionError:
+            self.M_prozent_4_16.append(0)
+        for x in range(61, 74):
             try:
-                self.M_prozent_16_32.append((self.data[74]/self.Einwaage_16_32)*100)
+                self.M_prozent_16_32.append((self.data[x]/self.Einwaage_16_32)*100)
             except ZeroDivisionError:
-                mBox.showinfo("", "Keine Einwaage für Kies 16/32")
+                self.M_prozent_16_32.append(0)
+        if self.checkVar16_32.get() == 1 and self.data[74] == 0:
+            mBox.showinfo('', 'Keine Einwaage für Rücklauf 16/32')
+        try:
+            self.M_prozent_16_32.append((self.data[74]/self.Einwaage_16_32)*100)
+        except ZeroDivisionError:
+            self.M_prozent_16_32.append(0)
         self.create_plot()
 
     def create_file(self):
@@ -406,6 +614,26 @@ class OOP():
                          }
                 for key, value in Daten.items():
                     file.write(str(value)+"\n")
+                try:
+                    self.eigen_p_ertrag = (self.data[14]/self.data[12])*100
+                except:
+                    ZeroDivisionError
+                    self.eigen_p_ertrag = 0
+                try:
+                    self.eigen_p_sand = (self.data[32]/self.data[30])*100
+                except:
+                    ZeroDivisionError
+                    self.eigen_p_sand = 0
+                try:
+                    self.eigen_p_4_16 = (self.data[44]/self.data[42])*100
+                except:
+                    ZeroDivisionError
+                    self.eigen_p_4_16 = 0
+                try:
+                    self.eigen_p_16_32 = (self.data[60]/self.data[58])*100
+                except:
+                    ZeroDivisionError
+                    self.eigen_p_16_32 = 0
                 file.close()
                 self.calculate_data()
             else:
@@ -416,7 +644,6 @@ class OOP():
         # Tab Control introduced here -----------------------
         tabControl = ttk.Notebook(self.win)
         # Create Tab Control
-        82
         tab1 = ttk.Frame(tabControl)
         tabControl.add(tab1, text='Ertrag 0/32')
         Eigenfeuchte1 = ttk.Label(tab1, text="Eigenfeuchte:")
